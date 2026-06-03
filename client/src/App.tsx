@@ -1,7 +1,5 @@
 import { WEBSOCKET_URL } from "./config";
-import { useWebsocket } from "./websockets/state";
-import useWebsocketListener from "./websockets/useWebsocketListener";
-import WebsocketProvider from "./websockets/WebsocketProvider";
+import { useWebsocketListener, useWebsocket, WebsocketProvider } from "./websockets/context";
 
 const InnerApp = () => {
 	const socket = useWebsocket();

@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "react";
-
 import { useWebsocket } from "./state";
 
 const useWebsocketListener = <Data = unknown>(
