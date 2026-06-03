@@ -1,0 +1,21 @@
+{
+	"dependencies": {
+		"@types/node": "^25.9.1",
+		"cors": "^2.8.6",
+		"express": "^5.2.1",
+		"socket.io": "^4.8.3"
+	},
+	"scripts": {
+		"dev": "node --watch src/index.ts"
+	},
+	"author": "sanathsharma",
+	"description": "socket.io server",
+	"license": "MIT",
+	"main": "index.ts",
+	"name": "express-socketio-server",
+	"type": "module",
+	"version": "0.0.1",
+	"devDependencies": {
+		"@types/express": "^5.0.6"
+	}
+}
