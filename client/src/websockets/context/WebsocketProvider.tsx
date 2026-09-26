@@ -11,6 +11,11 @@ const WebsocketProvider: FC<PropsWithChildren<Props>> = ({ children, url }) => {
 
 	useEffect(() => {
 		const _socket = io(url, {
+			reconnection: true,
+			reconnectionDelay: 1000,
+			reconnectionAttempts: Infinity,
+			reconnectionDelayMax: 5000,
+			randomizationFactor: 0.5,
 			// For authentication through token
 			// auth: {
 			// 	token: "SAMPLE_TOKEN_FOR_AUTHENTICATION",
@@ -27,11 +32,10 @@ const WebsocketProvider: FC<PropsWithChildren<Props>> = ({ children, url }) => {
 			console.log("[WebsocketProvider:connect] Connected to socket.io server");
 			setSocket(_socket);
 		});
-		_socket.on("disconnect", () => {
+		_socket.on("disconnect", (reason) => {
 			console.log(
-				"[WebsocketProvider:disconnect] Disconnected from socket.io server",
+				`[WebsocketProvider:disconnect] Disconnected from socket.io server: ${reason}`,
 			);
-			setSocket(null);
 		});
 		_socket.on("error", (err) => {
 			console.error(
@@ -39,10 +43,31 @@ const WebsocketProvider: FC<PropsWithChildren<Props>> = ({ children, url }) => {
 				err,
 			);
 		});
-		_socket.on("connect_failed", (err) => {
+		_socket.on("connect_error", (err) => {
 			console.error(
-				"[WebsocketProvider:connect_failed] Failed to connect to socket.io server",
+				"[WebsocketProvider:connect_error] Failed to connect to socket.io server",
 				err,
+			);
+		});
+		_socket.io.on("reconnect_attempt", (attempt) => {
+			console.log(
+				`[WebsocketProvider:reconnect_attempt] Reconnection attempt #${attempt}`,
+			);
+		});
+		_socket.io.on("reconnect", (attempt) => {
+			console.log(
+				`[WebsocketProvider:reconnect] Reconnected to socket.io server after ${attempt} attempt(s)`,
+			);
+		});
+		_socket.io.on("reconnect_error", (err) => {
+			console.error(
+				"[WebsocketProvider:reconnect_error] Reconnection attempt failed",
+				err,
+			);
+		});
+		_socket.io.on("reconnect_failed", () => {
+			console.error(
+				"[WebsocketProvider:reconnect_failed] All reconnection attempts failed",
 			);
 		});
 		// See https://www.tutorialspoint.com/socket.io/socket.io_error_handling.htm

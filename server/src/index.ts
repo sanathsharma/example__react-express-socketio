@@ -10,6 +10,9 @@ const server = app.listen(PORT, () => {
 
 const io = new Server(server, {
 	cors: SOCKET_IO_CORS_OPTIONS,
+	connectionStateRecovery: {
+		maxDisconnectionDuration: 2 * 60 * 1000,
+	},
 });
 
 /* Expose the socket.io server instance to the app
@@ -45,10 +48,18 @@ io.use((socket, next) => {
 });
 
 io.on("connection", (socket) => {
-	console.log("A user connected");
+	console.log(`A user connected (recovered: ${socket.recovered})`);
 	// Make user join to a room with his userId, so that api handles can emit events to the user via the room, so that socket id need not be directly linked to the user
-	// const userId = socket.userId;
-	// socket.join(`user-${userId}`);
+	//
+	// If connectionStateRecovery already restored this socket's rooms and data, skip rejoining
+	// if (socket.recovered) {
+	// 	// rooms and socket.data were already restored, nothing to do
+	// } else {
+	// 	const userId = socket.userId;
+	// 	socket.join(`user-${userId}`);
+	// 	socket.data.userId = userId;
+	// }
+	//
 	// Example of emitting event to a user
 	// const socket = req.app.get("io");
 	// socket.to(`user-${userId}`).emit('job_complete', { jobId: 1234, status: 'completed' });
@@ -58,8 +69,8 @@ io.on("connection", (socket) => {
 		socket.emit(SERVER_EVENTS.RECEIVE_MESSAGE, data);
 	});
 
-	socket.on("disconnect", () => {
-		console.log("A user disconnected");
+	socket.on("disconnect", (reason) => {
+		console.log(`A user disconnected: ${reason}`);
 		// socket.leave(`user-${userId}`);
 	});
 });
