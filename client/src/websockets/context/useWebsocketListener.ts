@@ -17,12 +17,13 @@ const useWebsocketListener = <Data = unknown>(
 			return;
 		}
 
-		socket.on(eventName, (data) => {
+		const handler = (data: Data) => {
 			callbackRef.current?.(data);
-		});
+		};
+		socket.on(eventName, handler);
 
 		return () => {
-			socket.off(eventName);
+			socket.off(eventName, handler);
 		};
 	}, [eventName, socket]);
 };
